@@ -21,10 +21,28 @@ public class BoardService {
     }
 
     public BoardResponseDto boardPosting(BoardRequestDto requestDto) {
-        User user = userRepository.findById(1L).orElseThrow(
-                () -> new DataNotFoundException("조회된 유저 정보가 없습니다.")
-        );
+        Long userId = 1L;
+        User user = findUser(userId);
         Board board = boardRepository.save(new Board(requestDto, user));
         return new BoardResponseDto(board, user.getUserName());
+    }
+
+    public BoardResponseDto boardSelectOne(Long boardId) {
+        Long userId = 1L;
+        User user = findUser(userId);
+        Board board = findBoard(boardId);
+        return new BoardResponseDto(board, user.getUserName());
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new DataNotFoundException("조회된 유저 정보가 없습니다.")
+        );
+    }
+
+    private Board findBoard(Long boardId) {
+        return boardRepository.findById(boardId).orElseThrow(
+                () -> new DataNotFoundException("조회된 게시글의 정보가 없습니다.")
+        );
     }
 }
