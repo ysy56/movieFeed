@@ -1,8 +1,10 @@
 package com.sparta.moviefeed.dto.responsedto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonResponse<T> {
     private Integer httpStatusCode;
     private String message;
