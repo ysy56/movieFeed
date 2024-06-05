@@ -1,5 +1,6 @@
 package com.sparta.moviefeed.controller;
 
+import com.sparta.moviefeed.dto.requestdto.UserLoginRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.dto.responsedto.UserResponseDto;
 import com.sparta.moviefeed.service.UserService;
@@ -28,6 +29,15 @@ public class UserController {
         UserResponseDto userResponseDto = new UserResponseDto(201, "회원가입 성공");
 
         return new ResponseEntity<>(userResponseDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDto> login(@RequestBody UserLoginRequestDto requestDto) {
+        userservice.login(requestDto);
+
+        UserResponseDto userResponseDto = new UserResponseDto(200, "로그인 성공");
+
+        return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
     }
 
 }

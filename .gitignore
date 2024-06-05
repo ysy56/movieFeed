@@ -35,4 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### env ###
 *.env
+
+### git ###
+.gitmessage.txt

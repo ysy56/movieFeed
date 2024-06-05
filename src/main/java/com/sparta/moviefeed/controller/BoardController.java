@@ -5,10 +5,7 @@ import com.sparta.moviefeed.dto.responsedto.BoardResponseDto;
 import com.sparta.moviefeed.service.BoardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/board")
@@ -28,6 +25,17 @@ public class BoardController {
     @PostMapping // @AuthenticationPrincipal UserDetails
     public ResponseEntity<BoardResponseDto> boardPosting(@RequestBody BoardRequestDto requestDto) {
         BoardResponseDto responseDto = boardService.boardPosting(requestDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+    /**
+     * 특정 게시글 조회 기능
+     * @param boardId : 특정 게시글의 번호
+     * @return : 특정 게시글 조회 데이터
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<BoardResponseDto> boardSelectOne(@PathVariable("id") Long boardId) {
+        BoardResponseDto responseDto = boardService.boardSelectOne(boardId);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

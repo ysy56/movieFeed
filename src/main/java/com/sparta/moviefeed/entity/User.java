@@ -68,4 +68,5 @@ public class User extends Timestamped {
     public void encryptionPassword(String password) {
         this.password = password;
     }
+  
 }
