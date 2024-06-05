@@ -1,6 +1,7 @@
 package com.sparta.moviefeed.controller;
 
 import com.sparta.moviefeed.config.EmailConfig;
+import com.sparta.moviefeed.dto.requestdto.EmailCheckRequestDto;
 import com.sparta.moviefeed.dto.requestdto.EmailRequestDto;
 import com.sparta.moviefeed.dto.responsedto.CommonResponse;
 import com.sparta.moviefeed.service.EmailService;
@@ -26,6 +27,13 @@ public class EmailController {
     public ResponseEntity<CommonResponse> sendEmail(@Valid @RequestBody EmailRequestDto requestDto) {
         emailService.joinEmail(requestDto);
         CommonResponse response = new CommonResponse(200, "인증 이메일 보내기 성공");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<CommonResponse> checkAuthCode(@Valid @RequestBody EmailCheckRequestDto requestDto) {
+        emailService.checkAuthCode(requestDto);
+        CommonResponse response = new CommonResponse(200, "이메일 인증 성공");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

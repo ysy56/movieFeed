@@ -1,6 +1,9 @@
 package com.sparta.moviefeed.service;
 
+import com.sparta.moviefeed.dto.requestdto.EmailCheckRequestDto;
 import com.sparta.moviefeed.dto.requestdto.EmailRequestDto;
+import com.sparta.moviefeed.exception.BadRequestException;
+import com.sparta.moviefeed.exception.DataNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -17,10 +20,12 @@ public class EmailService {
     private String fromEmail;
 
     private JavaMailSender mailSender;
-    private int authNumber;
+    private RedisUtil redisUtil;
+    private int authCode;
 
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(JavaMailSender mailSender, RedisUtil redisUtil) {
         this.mailSender = mailSender;
+        this.redisUtil = redisUtil;
     }
 
     public void makeRandomNumber() {
@@ -30,7 +35,7 @@ public class EmailService {
             randomNumber += Integer.toString(rand.nextInt(10));
         }
 
-        authNumber = Integer.parseInt(randomNumber);
+        authCode = Integer.parseInt(randomNumber);
     }
 
     public void joinEmail(EmailRequestDto requestDto) {
@@ -42,7 +47,7 @@ public class EmailService {
                 "<br>" +
                 "이메일 인증 요청을 받았음을 알려드립니다." +
                 "<br><br>" +
-                "인증번호는 " + authNumber + " 입니다." +
+                "인증번호는 " + authCode + " 입니다." +
                 "<br><br>" +
                 "인증번호 6자리를 제대로 입력해주세요.";
         sendEmail(toEmail, title, content);
@@ -59,6 +64,18 @@ public class EmailService {
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             e.printStackTrace();
+        }
+        redisUtil.setDataExpire(Integer.toString(authCode),toEmail,60*3L);
+
+    }
+
+    public void checkAuthCode(EmailCheckRequestDto requestDto) {
+        if (redisUtil.getData(requestDto.getAuthCode()) == null) {
+            throw new DataNotFoundException("발급된 인증번호가 없습니다. 다시 이메일 인증을 시도해주세요.");
+        }
+
+        if (!redisUtil.getData(requestDto.getAuthCode()).equals(requestDto.getEmail())) {
+            throw new BadRequestException("인증번호가 일치하지 않습니다.");
         }
     }
 }
