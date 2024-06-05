@@ -9,6 +9,8 @@ import com.sparta.moviefeed.repository.BoardRepository;
 import com.sparta.moviefeed.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BoardService {
 
@@ -20,18 +22,23 @@ public class BoardService {
         this.userRepository = userRepository;
     }
 
-    public BoardResponseDto boardPosting(BoardRequestDto requestDto) {
+    public BoardResponseDto postingBoard(BoardRequestDto requestDto) {
         Long userId = 1L;
         User user = findUser(userId);
         Board board = boardRepository.save(new Board(requestDto, user));
         return new BoardResponseDto(board, user.getUserName());
     }
 
-    public BoardResponseDto boardSelectOne(Long boardId) {
+    public BoardResponseDto selectBoard(Long boardId) {
         Long userId = 1L;
         User user = findUser(userId);
         Board board = findBoard(boardId);
         return new BoardResponseDto(board, user.getUserName());
+    }
+
+    public List<BoardResponseDto> selectAllBoard() {
+        return boardRepository.findAll()
+                .stream().map(BoardResponseDto::new).toList();
     }
 
     private User findUser(Long userId) {
@@ -45,4 +52,6 @@ public class BoardService {
                 () -> new DataNotFoundException("조회된 게시글의 정보가 없습니다.")
         );
     }
+
+
 }
