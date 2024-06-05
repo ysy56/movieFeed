@@ -1,5 +1,6 @@
 package com.sparta.moviefeed.entity;
 
+import com.sparta.moviefeed.dto.requestdto.MypageRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.enumeration.UserStatus;
 import jakarta.persistence.*;
@@ -51,6 +52,12 @@ public class User extends Timestamped {
         this.email = requestDto.getEmail();
         this.intro = requestDto.getIntro();
         this.userStatus = userStatus;
+    }
+
+    public void updateMypage(MypageRequestDto requestDto) {
+        this.userName = requestDto.getUserName();
+        this.email = requestDto.getEmail();
+        this.intro = requestDto.getIntro();
     }
 
 }
