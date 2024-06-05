@@ -27,9 +27,9 @@ public class UserService {
     @Transactional
     public void signup(UserSignupRequestDto requestDto) {
 
-        if (findByUserId(requestDto.getUserId()).isPresent()) {
+        findByUserId(requestDto.getUserId()).ifPresent( (el) -> {
             throw new ConflictException("이미 사용 중인 아이디입니다.");
-        }
+        });
 
         UserStatus userStatus = UserStatus.NORMAL;
         User user = new User(requestDto, userStatus);
@@ -51,10 +51,7 @@ public class UserService {
     }
 
     public Optional<User> findByUserId(String userId) {
-
-        Optional<User> user = userRepository.findByUserId(userId);
-
-        return user;
+        return userRepository.findByUserId(userId);
     }
 
     public boolean checkPassword(String requestPassword, String databasePassword) {
