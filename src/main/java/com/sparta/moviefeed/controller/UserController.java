@@ -3,6 +3,7 @@ package com.sparta.moviefeed.controller;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.dto.responsedto.UserResponseDto;
 import com.sparta.moviefeed.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signup(@RequestBody UserSignupRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> signup(@Valid @RequestBody UserSignupRequestDto requestDto) {
         userservice.signup(requestDto);
 
         UserResponseDto userResponseDto = new UserResponseDto(201, "회원가입 성공");
