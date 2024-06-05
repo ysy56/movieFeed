@@ -13,4 +13,9 @@ public class CommonResponse<T> {
         this.message = message;
         this.data = data;
     }
+
+    public CommonResponse(int httpStatusCode, String message) {
+        this.httpStatusCode = httpStatusCode;
+        this.message = message;
+    }
 }
