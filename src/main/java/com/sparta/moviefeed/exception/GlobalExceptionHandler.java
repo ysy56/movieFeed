@@ -3,10 +3,14 @@ package com.sparta.moviefeed.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -74,8 +78,15 @@ public class GlobalExceptionHandler {
      * @return : error message, HttpStatus.BAD_REQUEST => 400
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("{}", ex.getMessage());
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+
+        Map<String, String> errors = new HashMap<>();
+
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }
