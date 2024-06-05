@@ -2,13 +2,16 @@ package com.sparta.moviefeed.controller;
 
 import com.sparta.moviefeed.dto.requestdto.BoardRequestDto;
 import com.sparta.moviefeed.dto.responsedto.BoardResponseDto;
+import com.sparta.moviefeed.dto.responsedto.CommonResponse;
 import com.sparta.moviefeed.service.BoardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/board")
+@RequestMapping("/api/boards")
 public class BoardController {
 
     private final BoardService boardService;
@@ -23,9 +26,10 @@ public class BoardController {
      * @return : 등록 된 게시글의 정보 및 username
      */
     @PostMapping // @AuthenticationPrincipal UserDetails
-    public ResponseEntity<BoardResponseDto> boardPosting(@RequestBody BoardRequestDto requestDto) {
-        BoardResponseDto responseDto = boardService.boardPosting(requestDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    public ResponseEntity<CommonResponse<BoardResponseDto>> postingBoard(@RequestBody BoardRequestDto requestDto) {
+        BoardResponseDto responseDto = boardService.postingBoard(requestDto);
+        CommonResponse<BoardResponseDto> response = new CommonResponse<>(201, "게시글 등록 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**
@@ -34,9 +38,21 @@ public class BoardController {
      * @return : 특정 게시글 조회 데이터
      */
     @GetMapping("/{id}")
-    public ResponseEntity<BoardResponseDto> boardSelectOne(@PathVariable("id") Long boardId) {
-        BoardResponseDto responseDto = boardService.boardSelectOne(boardId);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    public ResponseEntity<CommonResponse<BoardResponseDto>> selectBoard(@PathVariable("id") Long boardId) {
+        BoardResponseDto responseDto = boardService.selectBoard(boardId);
+        CommonResponse<BoardResponseDto> response = new CommonResponse<>(200, "게시글 조회 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * 전체 게시글 조회 기능
+     * @return : 전체 게시글 조회 데이터
+     */
+    @GetMapping
+    public ResponseEntity<CommonResponse<List<BoardResponseDto>>> selectAllBoard() {
+        List<BoardResponseDto> boards = boardService.selectAllBoard();
+        CommonResponse<List<BoardResponseDto>> response = new CommonResponse<>(200, "게시글 전체 조회 성공",boards);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
