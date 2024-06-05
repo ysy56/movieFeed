@@ -55,4 +55,29 @@ public class BoardController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * 게시글 수정 기능
+     * @param boardId : 수정할 게시글의 id
+     * @param requestDto : 수정할 게시글의 정보
+     * @return : 수정된 게시글의 정보
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<CommonResponse<BoardResponseDto>> updateBoard(@PathVariable("id") Long boardId, @RequestBody BoardRequestDto requestDto) {
+        BoardResponseDto responseDto = boardService.updateBoard(boardId, requestDto);
+        CommonResponse<BoardResponseDto> response = new CommonResponse<>(200, "게시글 수정 성공", responseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * 게시글 삭제 기능
+     * @param boardId : 삭제할 게시글의 id
+     * @return : 삭제 완료 메시지 상태 코드 반환
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CommonResponse<Void>> deleteBoard(@PathVariable("id") Long boardId) {
+        boardService.deleteBoard(boardId);
+        CommonResponse<Void> response = new CommonResponse<>(204, "게시글 삭제 성공");
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    }
+
 }

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-//@NoArgsConstructor
+@NoArgsConstructor
 public class BoardResponseDto {
     private String title;
     private String content;
