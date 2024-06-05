@@ -5,6 +5,7 @@ import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.enumeration.UserStatus;
 import com.sparta.moviefeed.exception.ConflictException;
 import com.sparta.moviefeed.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +15,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -28,7 +31,9 @@ public class UserService {
 
         UserStatus userStatus = UserStatus.NORMAL;
         User user = new User(requestDto, userStatus);
+        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
+        user.encryptionPassword(encodedPassword);
         userRepository.save(user);
 
     }
