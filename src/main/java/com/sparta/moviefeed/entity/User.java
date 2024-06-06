@@ -65,6 +65,10 @@ public class User extends Timestamped {
         this.password = requestDto.getNewPassword();
     }
 
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
     public void encryptionPassword(String password) {
         this.password = password;
     }
