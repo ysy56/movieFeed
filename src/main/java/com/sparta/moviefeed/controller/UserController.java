@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<Void>> login(@RequestBody UserLoginRequestDto requestDto, HttpServletResponse response) {
+    public ResponseEntity<CommonResponse<Void>> login(@Valid @RequestBody UserLoginRequestDto requestDto, HttpServletResponse response) {
         userservice.login(requestDto, response);
 
         CommonResponse<Void> commonResponse = new CommonResponse<>(200, "로그인 성공");
