@@ -4,6 +4,7 @@ import com.sparta.moviefeed.dto.requestdto.UserLoginRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.dto.responsedto.CommonResponse;
 import com.sparta.moviefeed.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<Void>> login(@RequestBody UserLoginRequestDto requestDto) {
-        userservice.login(requestDto);
+    public ResponseEntity<CommonResponse<Void>> login(@RequestBody UserLoginRequestDto requestDto, HttpServletResponse response) {
+        userservice.login(requestDto, response);
 
         CommonResponse<Void> commonResponse = new CommonResponse<>(200, "로그인 성공");
 
