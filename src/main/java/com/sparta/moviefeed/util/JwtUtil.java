@@ -4,6 +4,7 @@ import com.sparta.moviefeed.config.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -24,7 +25,6 @@ public class JwtUtil {
     private long REFRESH_TOKEN_TIME;
 
     public static final String BEARER_PREFIX = "Bearer ";
-
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     private final JwtConfig jwtConfig;
     private final Key key;
@@ -62,12 +62,14 @@ public class JwtUtil {
                 .path("/")
                 .sameSite("Strict")
                 .build();
-
     }
 
-    public String getAccessTokenFromHeader(String bearerToken) {
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
+    public String getAccessTokenFromHeader(HttpServletRequest request) {
+
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith(BEARER_PREFIX)) {
+            return authorizationHeader.substring(7);
         }
 
         return null;
