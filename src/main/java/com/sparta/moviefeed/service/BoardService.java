@@ -13,11 +13,9 @@ import com.sparta.moviefeed.repository.BoardRepository;
 import com.sparta.moviefeed.repository.LikeRepository;
 import com.sparta.moviefeed.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,6 +79,10 @@ public class BoardService {
         }
     }
 
+    public Long findByBoardLikes(Long boardId) {
+        return likeRepository.countByBoardId(boardId);
+    }
+
     private User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new DataNotFoundException("조회된 유저 정보가 없습니다.")
@@ -92,4 +94,5 @@ public class BoardService {
                 () -> new DataNotFoundException("조회된 게시글의 정보가 없습니다.")
         );
     }
+
 }
