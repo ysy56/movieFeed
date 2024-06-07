@@ -39,10 +39,8 @@ public class BoardService {
     }
 
     public BoardResponseDto selectBoard(Long boardId) {
-        Long userId = 1L;
-        User user = findUser(userId);
         Board board = findBoard(boardId);
-        return new BoardResponseDto(board, user.getUserName());
+        return new BoardResponseDto(board);
     }
 
     public List<BoardResponseDto> selectAllBoard() {
