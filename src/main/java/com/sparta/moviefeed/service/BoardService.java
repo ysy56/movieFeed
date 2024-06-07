@@ -7,6 +7,7 @@ import com.sparta.moviefeed.entity.Like;
 import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.enumeration.LikeType;
 import com.sparta.moviefeed.exception.DataNotFoundException;
+import com.sparta.moviefeed.exception.ForbiddenException;
 import com.sparta.moviefeed.exception.ViolatedLikeException;
 import com.sparta.moviefeed.repository.BoardRepository;
 import com.sparta.moviefeed.repository.LikeRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class BoardService {
@@ -32,10 +34,9 @@ public class BoardService {
         this.likeRepository = likeRepository;
     }
 
-    public BoardResponseDto postingBoard(BoardRequestDto requestDto) {
-        Long userId = 1L;
-        User user = findUser(userId);
-        Board board = boardRepository.save(new Board(requestDto, user));
+    public BoardResponseDto postingBoard(BoardRequestDto requestDto, User user) {
+        User userInfo = findUser(user.getId());
+        Board board = boardRepository.save(new Board(requestDto, userInfo));
         return new BoardResponseDto(board, user.getUserName());
     }
 
@@ -52,22 +53,27 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponseDto updateBoard(Long boardId, BoardRequestDto requestDto) {
+    public BoardResponseDto updateBoard(Long boardId, BoardRequestDto requestDto, User user) {
         Board board = findBoard(boardId);
+        if(!Objects.equals(board.getUser().getUserId(), user.getUserId())) {
+            throw new ForbiddenException("해당 게시글의 작성자가 아닙니다.");
+        }
         board.update(requestDto);
         return new BoardResponseDto(board);
     }
 
-    public void deleteBoard(Long boardId) {
+    public void deleteBoard(Long boardId, User userDetails) {
         Board board = findBoard(boardId);
+        if(!Objects.equals(board.getUser().getUserId(), userDetails.getUserId())) {
+            throw new ForbiddenException("해당 게시글의 작성자가 아닙니다.");
+        }
         boardRepository.delete(board);
     }
 
-    public void increasedBoardLikes(Long boardId) {
-        Long userId = 1L;
-        User user = findUser(userId);
+    public void increasedBoardLikes(Long boardId, User user) {
+        User userInfo = findUser(user.getId());
         Board board = findBoard(boardId);
-        Like like = new Like(user, board, LikeType.BOARD);
+        Like like = new Like(userInfo, board, LikeType.BOARD);
         try {
             likeRepository.save(like);
         } catch(DataIntegrityViolationException ex) {
