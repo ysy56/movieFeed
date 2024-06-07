@@ -7,6 +7,7 @@ import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.exception.DataNotFoundException;
 import com.sparta.moviefeed.repository.BoardRepository;
 import com.sparta.moviefeed.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +42,18 @@ public class BoardService {
                 .stream().map(BoardResponseDto::new).toList();
     }
 
+    @Transactional
+    public BoardResponseDto updateBoard(Long boardId, BoardRequestDto requestDto) {
+        Board board = findBoard(boardId);
+        board.update(requestDto);
+        return new BoardResponseDto(board);
+    }
+
+    public void deleteBoard(Long boardId) {
+        Board board = findBoard(boardId);
+        boardRepository.delete(board);
+    }
+
     private User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new DataNotFoundException("조회된 유저 정보가 없습니다.")
@@ -52,6 +65,4 @@ public class BoardService {
                 () -> new DataNotFoundException("조회된 게시글의 정보가 없습니다.")
         );
     }
-
-
 }
