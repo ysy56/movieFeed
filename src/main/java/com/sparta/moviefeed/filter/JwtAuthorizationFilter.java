@@ -32,17 +32,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String tokenValue = jwtUtil.getAccessTokenFromHeader(request);
 
-        if (!StringUtils.hasText(tokenValue) || !jwtUtil.validateToken(tokenValue)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("text/plain;charset=utf-8");
-            response.getWriter().write("로그인 후 이용해 주세요.");
+        if (StringUtils.hasText(tokenValue)) {
 
-            return;
+            if (!jwtUtil.validateToken(tokenValue)) {
+                throw new ServletException("토큰 검증 실패");
+            }
+
+            Claims info = jwtUtil.getClaimsFromToken(tokenValue);
+
+            try {
+                setAuthentication(info.getSubject());
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+
         }
 
-        Claims info = jwtUtil.getClaimsFromToken(tokenValue);
-
-        setAuthentication(info.getSubject());
         filterChain.doFilter(request, response);
 
     }

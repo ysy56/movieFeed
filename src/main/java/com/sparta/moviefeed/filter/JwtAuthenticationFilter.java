@@ -5,7 +5,6 @@ import com.sparta.moviefeed.dto.requestdto.UserLoginRequestDto;
 import com.sparta.moviefeed.dto.responsedto.CommonResponse;
 import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.enumeration.UserStatus;
-import com.sparta.moviefeed.exception.BadRequestException;
 import com.sparta.moviefeed.repository.UserRepository;
 import com.sparta.moviefeed.security.UserDetailsImpl;
 import com.sparta.moviefeed.util.JwtUtil;
@@ -15,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -35,10 +35,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws BadRequestException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         if (!request.getMethod().equals("POST")) {
-            throw new BadRequestException("Authentication method not supported: " + request.getMethod());
+            throw new AuthenticationServiceException("잘못된 http 요청입니다.");
         }
 
         try {
@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("아이디, 비밀번호를 확인해주세요");
+            response.getWriter().write("아이디, 비밀번호를 확인해주세요.");
 
             return;
         }
@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType("text/plain;charset=UTF-8");
-        response.getWriter().write("아이디, 비밀번호를 확인해주세요");
+        response.getWriter().write("아이디, 비밀번호를 확인해주세요.");
     }
 
 }

@@ -3,6 +3,7 @@ package com.sparta.moviefeed.config;
 import com.sparta.moviefeed.filter.JwtAuthenticationFilter;
 import com.sparta.moviefeed.filter.JwtAuthorizationFilter;
 import com.sparta.moviefeed.repository.UserRepository;
+import com.sparta.moviefeed.security.CustomAuthenticationEntryPoint;
 import com.sparta.moviefeed.security.UserDetailsServiceImpl;
 import com.sparta.moviefeed.util.JwtUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -25,12 +26,14 @@ public class WebSecurityConfig {
     private final UserDetailsService userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserRepository userRepository;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, UserRepository userRepository) {
+    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, UserRepository userRepository, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
         this.userRepository = userRepository;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean
@@ -61,12 +64,16 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests( (authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/api/**").permitAll()
-//                        .anyRequest().authenticated()
+                        .requestMatchers("/**").permitAll()
+                        .anyRequest().authenticated()
         );
 
-        http.addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+        http.exceptionHandling( (exceptionHandling) -> {
+            exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint);
+        });
+
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
     }
