@@ -80,4 +80,16 @@ public class BoardController {
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 좋아요 등록 기능
+     * @param boardId : 좋아요 횟수가 추가 될 게시글 번호
+     * @return : 좋아요 등록에 대한 성공 메시지 및 상태 코드 반환
+     */
+    @PostMapping("/{id}/like")
+    public ResponseEntity<CommonResponse<Void>> increasedBoardLikes(@PathVariable("id") Long boardId) {
+        boardService.increasedBoardLikes(boardId);
+        CommonResponse<Void> response = new CommonResponse<>(201, "게시글 좋아요 등록 성공");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
 }

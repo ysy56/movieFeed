@@ -1,6 +1,7 @@
 package com.sparta.moviefeed.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.engine.jdbc.env.spi.SQLStateType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestControllerAdvice
@@ -88,5 +91,16 @@ public class GlobalExceptionHandler {
         }
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 중복된 좋아요가 눌렸을 경우[unique 제약 조건 위배 에러]
+     * @param ex : ViolatedLikeException[custom]
+     * @return : HttpStatus.CONFLICT => 409 : 클라이언트 요청에 대한 서버간 충돌
+     */
+    @ExceptionHandler(ViolatedLikeException.class)
+    public ResponseEntity<String> violatedLikeException(ViolatedLikeException ex) {
+        log.error("{}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 }

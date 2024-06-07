@@ -3,13 +3,20 @@ package com.sparta.moviefeed.service;
 import com.sparta.moviefeed.dto.requestdto.BoardRequestDto;
 import com.sparta.moviefeed.dto.responsedto.BoardResponseDto;
 import com.sparta.moviefeed.entity.Board;
+import com.sparta.moviefeed.entity.Like;
 import com.sparta.moviefeed.entity.User;
+import com.sparta.moviefeed.enumeration.LikeType;
 import com.sparta.moviefeed.exception.DataNotFoundException;
+import com.sparta.moviefeed.exception.ViolatedLikeException;
 import com.sparta.moviefeed.repository.BoardRepository;
+import com.sparta.moviefeed.repository.LikeRepository;
 import com.sparta.moviefeed.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @Service
@@ -17,10 +24,12 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
-    public BoardService(BoardRepository boardRepository, UserRepository userRepository) {
+    public BoardService(BoardRepository boardRepository, UserRepository userRepository, LikeRepository likeRepository) {
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
+        this.likeRepository = likeRepository;
     }
 
     public BoardResponseDto postingBoard(BoardRequestDto requestDto) {
@@ -52,6 +61,18 @@ public class BoardService {
     public void deleteBoard(Long boardId) {
         Board board = findBoard(boardId);
         boardRepository.delete(board);
+    }
+
+    public void increasedBoardLikes(Long boardId) {
+        Long userId = 1L;
+        User user = findUser(userId);
+        Board board = findBoard(boardId);
+        Like like = new Like(user, board, LikeType.BOARD);
+        try {
+            likeRepository.save(like);
+        } catch(DataIntegrityViolationException ex) {
+            throw new ViolatedLikeException("좋아요는 한번만 누를 수 있습니다.");
+        }
     }
 
     private User findUser(Long userId) {
