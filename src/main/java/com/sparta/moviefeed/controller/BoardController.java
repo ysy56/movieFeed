@@ -42,8 +42,8 @@ public class BoardController {
      * @param boardId : 특정 게시글의 번호
      * @return : 특정 게시글 조회 데이터
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<BoardResponseDto>> selectBoard(@PathVariable("id") Long boardId) {
+    @GetMapping("/{boardId}")
+    public ResponseEntity<CommonResponse<BoardResponseDto>> selectBoard(@PathVariable Long boardId) {
         BoardResponseDto responseDto = boardService.selectBoard(boardId);
         CommonResponse<BoardResponseDto> response = new CommonResponse<>(200, "게시글 조회 성공", responseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -66,9 +66,9 @@ public class BoardController {
      * @param requestDto : 수정할 게시글의 정보
      * @return : 수정된 게시글의 정보
      */
-    @PutMapping("/{id}")
+    @PutMapping("/{boardId}")
     public ResponseEntity<CommonResponse<BoardResponseDto>> updateBoard(
-            @PathVariable("id") Long boardId,
+            @PathVariable Long boardId,
             @RequestBody BoardRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
@@ -82,9 +82,9 @@ public class BoardController {
      * @param boardId : 삭제할 게시글의 id
      * @return : 삭제 완료 메시지 상태 코드 반환
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{boardId}")
     public ResponseEntity<CommonResponse<Void>> deleteBoard(
-            @PathVariable("id") Long boardId,
+            @PathVariable Long boardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
         boardService.deleteBoard(boardId, userDetails.getUser());
@@ -97,14 +97,26 @@ public class BoardController {
      * @param boardId : 좋아요 횟수가 추가 될 게시글 번호
      * @return : 좋아요 등록에 대한 성공 메시지 및 상태 코드 반환
      */
-    @PostMapping("/{id}/like")
+    @PostMapping("/{boardId}/like")
     public ResponseEntity<CommonResponse<Void>> increasedBoardLikes(
-            @PathVariable("id") Long boardId,
+            @PathVariable Long boardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
         boardService.increasedBoardLikes(boardId, userDetails.getUser());
         CommonResponse<Void> response = new CommonResponse<>(201, "게시글 좋아요 등록 성공");
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    /**
+     * 특정 게시글 좋아요 조회 기능 ( 좋아요가 없을 경우 0을 반환 ) => Long default 0
+     * @param boardId : 특정 게시글의 게시글 번호
+     * @return : likeCount => 특정 게시글의 좋아요 갯수 반환
+     */
+    @GetMapping("/{boardId}/like")
+    public ResponseEntity<CommonResponse<Long>> findByBoardLikes(@PathVariable Long boardId) {
+        Long likeCount = boardService.findByBoardLikes(boardId);
+        CommonResponse<Long> response = new CommonResponse<>(200, "해당 게시글의 좋아요 조회 성공", likeCount);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
