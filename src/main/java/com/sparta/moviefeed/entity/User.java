@@ -69,6 +69,11 @@ public class User extends Timestamped {
         this.refreshToken = refreshToken;
     }
 
+    public void updateUserStatus(UserStatus userStatus, LocalDateTime statusAt) {
+        this.userStatus = userStatus;
+        this.statusAt = statusAt;
+    }
+
     public void encryptionPassword(String password) {
         this.password = password;
     }
