@@ -30,7 +30,7 @@ public class UserController {
         return new ResponseEntity<>(commonResponse, HttpStatus.CREATED);
     }
 
-    @PostMapping("logout")
+    @PostMapping("/logout")
     public ResponseEntity<CommonResponse<Void>> logout() {
         userservice.logout();
 

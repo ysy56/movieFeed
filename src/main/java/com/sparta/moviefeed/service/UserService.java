@@ -48,7 +48,6 @@ public class UserService {
         User user = findByUserId(userDetails.getUsername()).orElseThrow( () -> new DataNotFoundException("해당 회원은 존재하지 않습니다."));
 
         user.updateRefreshToken(null);
-        userRepository.save(user);
 
     }
 
