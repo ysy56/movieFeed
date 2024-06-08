@@ -98,12 +98,12 @@ public class BoardController {
      * @return : 좋아요 등록에 대한 성공 메시지 및 상태 코드 반환
      */
     @PostMapping("/{boardId}/like")
-    public ResponseEntity<CommonResponse<Void>> increasedBoardLikes(
+    public ResponseEntity<CommonResponse<Long>> increasedBoardLikes(
             @PathVariable Long boardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        boardService.increasedBoardLikes(boardId, userDetails.getUser());
-        CommonResponse<Void> response = new CommonResponse<>(201, "게시글 좋아요 등록 성공");
+        Long likeCount = boardService.increasedBoardLikes(boardId, userDetails.getUser());
+        CommonResponse<Long> response = new CommonResponse<>(201, "게시글 좋아요 등록 성공", likeCount);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -113,10 +113,25 @@ public class BoardController {
      * @return : likeCount => 특정 게시글의 좋아요 갯수 반환
      */
     @GetMapping("/{boardId}/like")
-    public ResponseEntity<CommonResponse<Long>> findByBoardLikes(@PathVariable Long boardId) {
-        Long likeCount = boardService.findByBoardLikes(boardId);
+    public ResponseEntity<CommonResponse<Long>> findByBoardLike(@PathVariable Long boardId) {
+        Long likeCount = boardService.findByBoardLike(boardId);
         CommonResponse<Long> response = new CommonResponse<>(200, "해당 게시글의 좋아요 조회 성공", likeCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * 좋아요 삭제 기능
+     * @param boardId : 삭제할 좋아요의 게시글의 번호
+     * @param userDetails : 삭제할 좋아요의 유저 번호
+     * @return :
+     */
+    @DeleteMapping("/{boardId}/like")
+    public ResponseEntity<CommonResponse<Long>> deleteBoardLike(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        Long likeCount = boardService.deleteBoardLike(boardId, userDetails.getUser());
+        CommonResponse<Long> response = new CommonResponse<>(204, "좋아요가 삭제되었습니다.", likeCount);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    }
 }

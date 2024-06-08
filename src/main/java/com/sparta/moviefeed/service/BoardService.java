@@ -23,18 +23,15 @@ import java.util.Objects;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
     private final LikeRepository likeRepository;
 
-    public BoardService(BoardRepository boardRepository, UserRepository userRepository, LikeRepository likeRepository) {
+    public BoardService(BoardRepository boardRepository, LikeRepository likeRepository) {
         this.boardRepository = boardRepository;
-        this.userRepository = userRepository;
         this.likeRepository = likeRepository;
     }
 
     public BoardResponseDto postingBoard(BoardRequestDto requestDto, User user) {
-        User userInfo = findUser(user.getId());
-        Board board = boardRepository.save(new Board(requestDto, userInfo));
+        Board board = boardRepository.save(new Board(requestDto, user));
         return new BoardResponseDto(board, user.getUserName());
     }
 
@@ -66,25 +63,28 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
-    public void increasedBoardLikes(Long boardId, User user) {
-        User userInfo = findUser(user.getId());
+    public Long increasedBoardLikes(Long boardId, User user) {
         Board board = findBoard(boardId);
-        Like like = new Like(userInfo, board, LikeType.BOARD);
+        Like like = new Like(user, board, LikeType.BOARD);
         try {
             likeRepository.save(like);
         } catch(DataIntegrityViolationException ex) {
             throw new ViolatedLikeException("좋아요는 한번만 누를 수 있습니다.");
         }
+        return findByBoardLike(boardId);
     }
 
-    public Long findByBoardLikes(Long boardId) {
+    public Long findByBoardLike(Long boardId) {
         return likeRepository.countByBoardId(boardId);
     }
 
-    private User findUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new DataNotFoundException("조회된 유저 정보가 없습니다.")
+    public Long deleteBoardLike(Long boardId, User user) {
+        Board board = findBoard(boardId);
+        Like like = likeRepository.findByUserAndBoard(user, board).orElseThrow(
+                () -> new DataNotFoundException("좋아요의 정보가 없습니다.")
         );
+        likeRepository.delete(like);
+        return findByBoardLike(boardId);
     }
 
     private Board findBoard(Long boardId) {
@@ -92,5 +92,4 @@ public class BoardService {
                 () -> new DataNotFoundException("조회된 게시글의 정보가 없습니다.")
         );
     }
-
 }
