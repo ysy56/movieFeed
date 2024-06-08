@@ -4,7 +4,10 @@ import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.enumeration.UserStatus;
 import com.sparta.moviefeed.exception.ConflictException;
+import com.sparta.moviefeed.exception.DataNotFoundException;
 import com.sparta.moviefeed.repository.UserRepository;
+import com.sparta.moviefeed.security.UserDetailsImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,16 @@ public class UserService {
 
         user.encryptionPassword(encodedPassword);
         userRepository.save(user);
+
+    }
+
+    @Transactional
+    public void logout() {
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = findByUserId(userDetails.getUsername()).orElseThrow( () -> new DataNotFoundException("해당 회원은 존재하지 않습니다."));
+
+        user.updateRefreshToken(null);
 
     }
 
