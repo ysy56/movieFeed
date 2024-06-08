@@ -1,8 +1,10 @@
 package com.sparta.moviefeed.service;
 
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
+import com.sparta.moviefeed.dto.requestdto.UserWithdrawalRequestDto;
 import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.enumeration.UserStatus;
+import com.sparta.moviefeed.exception.BadRequestException;
 import com.sparta.moviefeed.exception.ConflictException;
 import com.sparta.moviefeed.exception.DataNotFoundException;
 import com.sparta.moviefeed.repository.UserRepository;
@@ -12,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -51,8 +54,33 @@ public class UserService {
 
     }
 
+    @Transactional
+    public void withdrawal(UserWithdrawalRequestDto requestDto) {
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = findByUserId(userDetails.getUsername()).orElseThrow( () -> new DataNotFoundException("해당 회원은 존재하지 않습니다."));
+
+        if (!checkPassword(requestDto.getPassword(), user.getPassword())) {
+            throw new BadRequestException("비밀번호를 확인해주세요.");
+        }
+
+        if (user.getUserStatus() == UserStatus.LEAVE) {
+            throw new ConflictException("이미 탈퇴한 회원입니다.");
+        }
+
+        UserStatus userStatus = UserStatus.LEAVE;
+        LocalDateTime now = LocalDateTime.now();
+
+        user.updateUserStatus(userStatus, now);
+
+    }
+
     public Optional<User> findByUserId(String userId) {
         return userRepository.findByUserId(userId);
+    }
+
+    public boolean checkPassword(String requestPassword, String userPassword) {
+        return passwordEncoder.matches(requestPassword, userPassword);
     }
 
 }
