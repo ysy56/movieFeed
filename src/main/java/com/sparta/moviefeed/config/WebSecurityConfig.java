@@ -9,6 +9,7 @@ import com.sparta.moviefeed.util.JwtUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -64,7 +65,9 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests( (authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("api/users/login", "/api/users/signup", "/api/users/refresh").permitAll()
+                        .requestMatchers("/api/users/login", "/api/users/signup", "/api/users/refresh").permitAll()
+                        .requestMatchers("/api/email").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/boards", "/api/boards/*", "/api/boards/*/comment", "/api/boards/*/like").permitAll()
                         .anyRequest().authenticated()
         );
 
