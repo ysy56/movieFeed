@@ -56,4 +56,16 @@ public class CommentService {
 
         return new CommentResponseDto(comment);
     }
+
+    public void deleteComment(Long commentId, User user) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new DataNotFoundException("해당 댓글을 찾을 수 없습니다.")
+        );
+
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new IllegalStateException("삭제 권한이 없습니다.");
+        };
+
+        commentRepository.delete(comment);
+    }
 }

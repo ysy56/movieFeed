@@ -1,8 +1,6 @@
 package com.sparta.moviefeed.controller;
 
-import com.sparta.moviefeed.dto.requestdto.BoardRequestDto;
 import com.sparta.moviefeed.dto.requestdto.CommentRequestDto;
-import com.sparta.moviefeed.dto.responsedto.BoardResponseDto;
 import com.sparta.moviefeed.dto.responsedto.CommentResponseDto;
 import com.sparta.moviefeed.dto.responsedto.CommonResponse;
 import com.sparta.moviefeed.security.UserDetailsImpl;
@@ -10,7 +8,6 @@ import com.sparta.moviefeed.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +43,7 @@ public class CommentController {
     public ResponseEntity<CommonResponse<List<CommentResponseDto>>> getAllComments(
             @PathVariable("id") Long boardId) {
         List<CommentResponseDto> comments = commentService.getAllComments(boardId);
-        CommonResponse<List<CommentResponseDto>> response = new CommonResponse<>(200, "댓글 조회 성공", comments);
+        CommonResponse<List<CommentResponseDto>> response = new CommonResponse<>(200, "댓글 전체 조회 성공", comments);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -59,6 +56,18 @@ public class CommentController {
     ) {
         CommentResponseDto responseDto = commentService.updateComment(commentId, requestDto, userDetails.getUser());
         CommonResponse<CommentResponseDto> response = new CommonResponse<>(200, "댓글 수정 성공", responseDto);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<CommonResponse<Void>> deleteComment(
+            @PathVariable("boardId") Long boardId,
+            @PathVariable("commentId") Long commentId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        commentService.deleteComment(commentId, userDetails.getUser());
+        CommonResponse<Void> response = new CommonResponse<>(200, "댓글 삭제 성공", null);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
