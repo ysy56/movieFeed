@@ -4,7 +4,9 @@ import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserWithdrawalRequestDto;
 import com.sparta.moviefeed.dto.responsedto.CommonResponse;
 import com.sparta.moviefeed.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,18 @@ public class UserController {
         CommonResponse<Void> commonResponse = new CommonResponse<>(200, "회원탈퇴 성공");
 
         return new ResponseEntity<>(commonResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<CommonResponse<Void>> refresh(HttpServletRequest request) {
+
+        String accessToken = userservice.refresh(request);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        CommonResponse<Void> commonResponse = new CommonResponse<>(200, "RefreshToken 인증 성공");
+
+        return new ResponseEntity<>(commonResponse, headers, HttpStatus.OK);
     }
 
 }
