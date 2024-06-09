@@ -1,5 +1,6 @@
 package com.sparta.moviefeed.filter;
 
+import com.sparta.moviefeed.exception.TokenExpiredException;
 import com.sparta.moviefeed.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -34,14 +35,23 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(tokenValue)) {
 
-            if (!jwtUtil.validateToken(tokenValue)) {
-                throw new ServletException("토큰 검증 실패");
-            }
-
-            Claims info = jwtUtil.getClaimsFromToken(tokenValue);
-
             try {
+
+                jwtUtil.checkTokenExpiration(tokenValue);
+
+                if (!jwtUtil.validateToken(tokenValue)) {
+                    throw new ServletException("토큰 검증 실패");
+                }
+
+                Claims info = jwtUtil.getClaimsFromToken(tokenValue);
                 setAuthentication(info.getSubject());
+
+            } catch (TokenExpiredException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("토큰 기간이 만료되었습니다.");
+
+                return;
             } catch (Exception e) {
                 throw new ServletException(e);
             }
