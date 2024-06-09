@@ -25,7 +25,7 @@ public class CommentService {
 
     public CommentResponseDto postingComment(CommentRequestDto requestDto, Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new DataNotFoundException("Board not found")
+                () -> new DataNotFoundException("해당 게시글을 찾을 수 없습니다.")
         );
         Comment comment = commentRepository.save(new Comment(requestDto, board, user));
         return new CommentResponseDto(comment);
@@ -38,5 +38,22 @@ public class CommentService {
         return comments.stream()
                 .map(CommentResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    public CommentResponseDto updateComment(Long commentId, CommentRequestDto requestDto, User user) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new DataNotFoundException("해당 댓글을 찾을 수 없습니다.")
+        );
+
+        // 댓글 작성자 확인
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new IllegalStateException("수정 권한이 없습니다.");
+        }
+
+        // 댓글 내용 수정
+        comment.update(requestDto);
+        commentRepository.save(comment);
+
+        return new CommentResponseDto(comment);
     }
 }

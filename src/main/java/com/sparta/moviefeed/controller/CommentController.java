@@ -50,4 +50,16 @@ public class CommentController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PutMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<CommonResponse<CommentResponseDto>> updateComment(
+            @PathVariable("boardId") Long boardId,
+            @PathVariable("commentId") Long commentId,
+            @RequestBody CommentRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        CommentResponseDto responseDto = commentService.updateComment(commentId, requestDto, userDetails.getUser());
+        CommonResponse<CommentResponseDto> response = new CommonResponse<>(200, "댓글 수정 성공", responseDto);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
