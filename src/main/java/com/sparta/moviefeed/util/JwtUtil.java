@@ -1,7 +1,9 @@
 package com.sparta.moviefeed.util;
 
 import com.sparta.moviefeed.config.JwtConfig;
+import com.sparta.moviefeed.exception.TokenExpiredException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -83,6 +85,24 @@ public class JwtUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public void checkTokenExpiration(String token) throws TokenExpiredException {
+
+        try {
+
+            Claims claims = getClaimsFromToken(token);
+            Date date = claims.getExpiration();
+            Date now = new Date();
+
+            if (date != null && date.before(now)) {
+                throw new TokenExpiredException("토큰이 만료되었습니다.");
+            }
+
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException("토큰이 만료되었습니다.");
+        }
+
     }
 
     public Claims getClaimsFromToken(String token) {
