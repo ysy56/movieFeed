@@ -57,7 +57,6 @@ public class User extends Timestamped {
 
     public void updateMypage(MypageRequestDto requestDto) {
         this.userName = requestDto.getUserName();
-        this.email = requestDto.getEmail();
         this.intro = requestDto.getIntro();
     }
 
