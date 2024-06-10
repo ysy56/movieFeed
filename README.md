@@ -236,7 +236,7 @@
 <br>
 
 ## ☁ ERD 다이어그램
-
+![ERD](https://github.com/ysy56/movieFeed/assets/78634780/f64018a9-cf5e-49cf-ae76-47ec74c18e70)
 <br>
 
 ## 📑 API 명세서
