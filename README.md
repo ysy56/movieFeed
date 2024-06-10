@@ -421,6 +421,7 @@ java.sql.SQLException: Data truncated for column 'user_status' at row 1
   * 발생한 현상(트러블) : /api/users/signup 엔드포인트가 인가를 요구하는 문제 발생
 
 * 트러블 원인 추론
+  
 WebSecurityConfig 클래스의 filter 처리 순서가 잘못설정 되어있다고 판단하여 addFilterBefore, addFilterAfter 메서드가 무엇인지에 대해서 찾아보고 여러 방법으로 변경해 보았습니다.
 
 ```
@@ -436,6 +437,7 @@ http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 ```
 
 * 해결방법
+  
 WebSecurityConfig의 설정에서 로직자체에는 문제가 없다는 결론을 내리고 해당 필터의 로직을 살펴 보았고 JwtAuthorizationFilter 클래스에서 doFilterInternal 메서드 부분에서 문제가 있는 걸 확인하였습니다.
 
 ```
