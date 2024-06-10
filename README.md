@@ -337,50 +337,80 @@
 <br>
 
 ## 🙄 신경쓴 부분
+* 개인 역량 최대한 발휘하기
+* 팀원 간의 원활한 소통과 협업을 통해 서로 배우고 성장하기
+* Git Commit & Code Convention 논의 후 잘 지키기
+* Issue 사용하기
 
 <br>
 
 ## 😫 트러블 슈팅
 <details>
-<summary> .env 최신화 문제 </summary>
+<summary> git push 및 .env 최신화 문제 </summary>
 
 * 문제 상황  
-  * 의도했던 기능 : 내용 작성  
-  * 발생한 현상(트러블) : 내용 작성  
+  * 의도했던 기능 : 각 팀원의 기능 구현으로 PR 후 git pull 했을 때 정상 작동하는 것
+  * 발생한 현상(트러블) : 프로그램을 동작시켰을 때 정상적으로 빌드되지 않고 error 발생
 
 * 트러블 원인 추론  
-// 내용 작성  
+1. email 관련 라이브러리가 없다는 error 발생
+   
+```
+Cannot resolve symbol 'JavaMailSender'
+Cannot resolve 'JavaMailSenderImpl'
+```   
+   ![git push error](https://github.com/ysy56/movieFeed/assets/78634780/4d11c5fb-0540-49ba-970d-d7be077ec2e9)
+
+2. .env의 jwt 관련 변수 설정이 없어서 error 발생
+```
+org.springframework.context.ApplicationContextException: Unable to start web server
+Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'webSecurityConfig' defined in file [C:\Users\ysy56\IdeaProjects\movieFeed\build\classes\java\main\com\sparta\moviefeed\config\WebSecurityConfig.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'jwtUtil': Injection of autowired dependencies failed
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jwtUtil': Injection of autowired dependencies failed
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'ACCESS_TOKEN_TIME' in value "${ACCESS_TOKEN_TIME}"
+```
+   ![env error](https://github.com/ysy56/movieFeed/assets/78634780/7e5bcb96-e9d3-4f10-9b07-763cc977e949)
+
 
 * 해결방법  
-// 내용 작성  
+1. 처음엔 다른 클래스의 라이브러리를 import하지 못하는 문제인 줄 알고 블로그를 따라 해보았다. [다른 클래스 라이브러리 import 문제 해결](https://zzang9ha.tistory.com/352#google_vignette)
+하지만, 문제는 해결 되지 않았고 라이브러리 문제이므로 build.gradle을 살펴보았다. 그 결과 build.gradle이 commit에 포함되지 않고 push를 했다는 사실을 발견했다. 결국 build.gradle에 없는 email 라이브러리를 추가하여 문제를 해결했다.
+2. email 라이브러리를 추가했음에도 문제가 발생했다. 팀원분이 .env 파일을 작성하는 법을 잘 모르셔서 name.env 이런 식으로 env를 작성하셨고 이 과정에서 .env 적용이 되지 않아 properties에 환경변수를 넣어서 사용하고 계셨다. 이게 문제인가 싶어서 .env 파일이 사용되도록 고쳤음에도 문제는 계속해 발생했다. 그러던 와중에 error의 내용을 잘 읽어보며 jwt관련해서 문제가 있다는 걸 발견한 후 인증/인가를 맡으셨던 팀원분이 .env에 추가된 환경변수가 있다는 걸 알려주지 않으셔서 발생했던 문제였다. 결국 jwt 관련 환경변수를 추가하여 문제를 해결했다.
+
 </details>
 
 <details>
 <summary> security 주석 문제 </summary>
 
 * 문제 상황  
-  * 의도했던 기능 : 내용 작성  
-  * 발생한 현상(트러블) : 내용 작성  
-
+  * 의도했던 기능 : 게시글, 마이페이지 등의 정상적인 CRUD 기능 동작을 통한 200번대 HTTP 상태코드 반환
+  * 발생한 현상(트러블) : 게시글, 마이페이지 등에서 CRUD 기능을 시도했을 때 401 인가 관련 error가 발생
+  
 * 트러블 원인 추론  
-// 내용 작성  
+spring security을 사용하여 작성한 코드가 없음에도 라이브러리를 사용하고 있던 것
+![401](https://github.com/ysy56/movieFeed/assets/78634780/c401b983-7976-4af3-9534-794c9ebbac15)
 
 * 해결방법  
-// 내용 작성  
+build.gradle에서 spring security를 주석 처리하고 재빌드하여 문제를 해결했다.
+ 
 </details>
 
 <details>
 <summary> UserStatus 문제 </summary>
 
 * 문제 상황  
-  * 의도했던 기능 : 내용 작성  
-  * 발생한 현상(트러블) : 내용 작성  
+  * 의도했던 기능 : 이메일 인증 시, 인증이 완료된 후 회원상태 코드를 `이메일 인증`으로 변경
+  * 발생한 현상(트러블) : 이메일 인증 시, header에 jwt를 넣었음에도 불구하고 '로그인 후 이용해주세요'라는 문구 표시
 
-* 트러블 원인 추론  
-// 내용 작성  
+* 트러블 원인 추론
+user_status에 `이메일 인증`을 추가하여 이메일 인증 후 회원상태 코드 변경 시 다음과 같은 문제가 발생
+```
+java.sql.SQLException: Data truncated for column 'user_status' at row 1
+```
 
-* 해결방법  
-// 내용 작성  
+* 해결방법
+처음 에러 문구를 확인 후 user_status의 코드가 문제가 있는지 확인해봤지만 문제는 없었다. 그래서 DB의 문제일 경우 보통 코드를 변경하게 되면 DB의 입력 제한과 다르기 때문에 문제가 발생했었다. 이를 기반으로 하여 DB의 테이블을 전부 지운 후 다시 회원가입하여 실행해서 문제를 해결했다.
+
 </details>
 
 <details>
