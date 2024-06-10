@@ -240,11 +240,18 @@
 <br>
 
 ## 📑 API 명세서
+[🌈Figma Link: API 명세서 + ERD 설계](https://www.figma.com/board/tSMVD3wg5zSrPHbTzjvtWW/13%EC%9D%BC%EC%9D%98-%EA%B8%88%EC%9A%94%EC%9D%BC?node-id=0-1&t=Bl9s2WWjCFgGyOtZ-0)
 
-<br>
+![1](https://github.com/ysy56/movieFeed/assets/78634780/7571d7cd-95e3-4848-9a97-32217c0782cf)
+![2](https://github.com/ysy56/movieFeed/assets/78634780/f4e674a3-ed99-420d-84d1-969b8086477a)
+![3](https://github.com/ysy56/movieFeed/assets/78634780/da56a035-68f5-48d4-bf96-cf05c649e7d1)
+![4](https://github.com/ysy56/movieFeed/assets/78634780/8776c481-f74a-40a5-8a12-75c74a559e59)
+![5](https://github.com/ysy56/movieFeed/assets/78634780/8a843377-ef4a-455d-ad92-6710df614de8)
+![6](https://github.com/ysy56/movieFeed/assets/78634780/b3b4d48c-410d-4e87-a67b-bc49096b83e0)
 
 ## 🏗 프로젝트 구조
 ```
+
 ```
 <br>
 
