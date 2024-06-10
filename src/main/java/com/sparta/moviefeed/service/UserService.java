@@ -14,6 +14,8 @@ import com.sparta.moviefeed.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -83,7 +85,8 @@ public class UserService {
 
     }
 
-    public String refresh(HttpServletRequest request) {
+    @Transactional
+    public HttpHeaders refresh(HttpServletRequest request) {
 
         Cookie[] cookies = request.getCookies();
         String tokenValue = null;
@@ -115,7 +118,17 @@ public class UserService {
             throw new UnauthorizedException("토큰 검증 실패");
         }
 
-        return jwtUtil.generateAccessToken(user.getUserId(), user.getUserName());
+        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getUserName());
+        String refreshToken = jwtUtil.generateNewRefreshToken(user.getUserId(), user.getUserName(), info.getExpiration());
+        ResponseCookie responseCookie = jwtUtil.generateNewRefreshTokenCookie(refreshToken, info.getExpiration());
+
+        user.updateRefreshToken(refreshToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        headers.add(HttpHeaders.SET_COOKIE, responseCookie.toString());
+
+        return headers;
     }
 
     public Optional<User> findByUserId(String userId) {

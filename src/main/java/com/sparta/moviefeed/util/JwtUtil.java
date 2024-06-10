@@ -57,10 +57,35 @@ public class JwtUtil {
         return generateToken(userId, userName, REFRESH_TOKEN_TIME);
     }
 
+    public String generateNewRefreshToken(String userId, String userName, Date expirationDate) {
+
+        Date date = new Date();
+
+        return Jwts.builder()
+                .setSubject(userId)
+                .claim("userName", userName)
+                .setExpiration(expirationDate)
+                .setIssuedAt(date)
+                .signWith(key, signatureAlgorithm)
+                .compact();
+    }
+
     public ResponseCookie generateRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .maxAge(REFRESH_TOKEN_TIME / 1000)
+                .path("/")
+                .sameSite("Strict")
+                .build();
+    }
+
+    public ResponseCookie generateNewRefreshTokenCookie(String refreshToken, Date expirationDate) {
+
+        long maxAge = (expirationDate.getTime() - new Date().getTime()) / 1000;
+
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .maxAge(maxAge)
                 .path("/")
                 .sameSite("Strict")
                 .build();
