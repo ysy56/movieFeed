@@ -50,10 +50,7 @@ public class UserController {
 
     @PostMapping("/refresh")
     public ResponseEntity<CommonResponse<Void>> refresh(HttpServletRequest request) {
-
-        String accessToken = userservice.refresh(request);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+        HttpHeaders headers = userservice.refresh(request);
 
         CommonResponse<Void> commonResponse = new CommonResponse<>(200, "RefreshToken 인증 성공");
 
