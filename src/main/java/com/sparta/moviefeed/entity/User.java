@@ -1,7 +1,6 @@
 package com.sparta.moviefeed.entity;
 
 import com.sparta.moviefeed.dto.requestdto.MypageRequestDto;
-import com.sparta.moviefeed.dto.requestdto.PasswordRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.enumeration.UserStatus;
 import jakarta.persistence.*;
@@ -60,8 +59,8 @@ public class User extends Timestamped {
         this.intro = requestDto.getIntro();
     }
 
-    public void updatePassword(PasswordRequestDto requestDto) {
-        this.password = requestDto.getNewPassword();
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
     }
 
     public void updateRefreshToken(String refreshToken) {

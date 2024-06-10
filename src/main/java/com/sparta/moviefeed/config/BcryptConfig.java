@@ -13,4 +13,7 @@ public class BcryptConfig {
         return new BCryptPasswordEncoder();
     }
 
+    public boolean matches(String rawPassword, String encodedPassword) {
+        return passwordEncoder().matches(rawPassword, encodedPassword);
+    }
 }

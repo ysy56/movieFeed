@@ -7,8 +7,11 @@ import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.exception.BadRequestException;
 import com.sparta.moviefeed.exception.ConflictException;
 import com.sparta.moviefeed.repository.UserRepository;
+import com.sparta.moviefeed.security.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,18 +22,19 @@ public class MypageService {
     private final Long userId = 2L;
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public MypageService(UserRepository userRepository) {
+    public MypageService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public MypageResponseDto getMypage() {
-//        // security 사용
-//        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        User user = userDetails.getUser();  // 여기서 user를 가져옵니다.
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getUser().getUserId();
 
         // security 사용X : 테스트를 위한 코드
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findByUserId(userId).orElseThrow(
             () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
         );
 
@@ -39,12 +43,10 @@ public class MypageService {
 
     @Transactional
     public MypageResponseDto updateMypage(MypageRequestDto requestDto) {
-//        // security 사용
-//        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        User user = userDetails.getUser();  // 여기서 user를 가져옵니다.
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getUser().getUserId();
 
-        // security 사용X : 테스트를 위한 코드
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findByUserId(userId).orElseThrow(
                 () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
         );
 
@@ -55,24 +57,24 @@ public class MypageService {
 
     @Transactional
     public void updatePassword(PasswordRequestDto requestDto) {
-//        // security 사용
-//        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        User user = userDetails.getUser();  // 여기서 user를 가져옵니다.
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getUser().getUserId();
 
-        // security 사용X : 테스트를 위한 코드
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findByUserId(userId).orElseThrow(
                 () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
         );
 
-        if (user.getPassword().equals(requestDto.getPassword())) {
-            if (!requestDto.getPassword().equals(requestDto.getNewPassword())) {
-                user.updatePassword(requestDto);
+        if (!requestDto.getPassword().equals(requestDto.getNewPassword())) {
+            if (passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+                String newPassword = passwordEncoder.encode(requestDto.getNewPassword());
+                user.updatePassword(newPassword);
             } else {
-                throw new ConflictException("현재 비밀번호와 새로운 비밀번호가 같습니다.");
+                throw new BadRequestException("비밀번호가 틀렸습니다.");
             }
         } else {
-            throw new BadRequestException("비밀번호가 틀렸습니다.");
+            throw new ConflictException("현재 비밀번호와 새로운 비밀번호가 같습니다.");
         }
+
 
     }
 }
