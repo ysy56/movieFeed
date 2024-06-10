@@ -1,16 +1,22 @@
 package com.sparta.moviefeed.service;
 
 import com.sparta.moviefeed.dto.requestdto.EmailCheckRequestDto;
-import com.sparta.moviefeed.dto.requestdto.EmailRequestDto;
+import com.sparta.moviefeed.entity.User;
+import com.sparta.moviefeed.enumeration.UserStatus;
 import com.sparta.moviefeed.exception.BadRequestException;
 import com.sparta.moviefeed.exception.DataNotFoundException;
+import com.sparta.moviefeed.repository.UserRepository;
+import com.sparta.moviefeed.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Service
@@ -19,13 +25,15 @@ public class EmailService {
     @Value("${email.fromEmail}")
     private String fromEmail;
 
+    private final UserRepository userRepository;
     private JavaMailSender mailSender;
     private RedisUtil redisUtil;
     private int authCode;
 
-    public EmailService(JavaMailSender mailSender, RedisUtil redisUtil) {
+    public EmailService(JavaMailSender mailSender, RedisUtil redisUtil, UserRepository userRepository) {
         this.mailSender = mailSender;
         this.redisUtil = redisUtil;
+        this.userRepository = userRepository;
     }
 
     public void makeRandomNumber() {
@@ -38,9 +46,16 @@ public class EmailService {
         authCode = Integer.parseInt(randomNumber);
     }
 
-    public void joinEmail(EmailRequestDto requestDto) {
+    public void joinEmail() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getUser().getUserId();
+
+        User user = userRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
+        );
+
         makeRandomNumber();
-        String toEmail = requestDto.getEmail();
+        String toEmail = user.getEmail();
         String title = "movieFeed 이메일 인증 코드입니다";
         String content =
                 "movieFeed의 이메일 인증 테스트입니다." +
@@ -69,7 +84,15 @@ public class EmailService {
 
     }
 
+    @Transactional
     public void checkAuthCode(EmailCheckRequestDto requestDto) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getUser().getUserId();
+
+        User user = userRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
+        );
+
         if (redisUtil.getData(requestDto.getAuthCode()) == null) {
             throw new DataNotFoundException("발급된 인증번호가 없습니다. 다시 이메일 인증을 시도해주세요.");
         }
@@ -77,5 +100,10 @@ public class EmailService {
         if (!redisUtil.getData(requestDto.getAuthCode()).equals(requestDto.getEmail())) {
             throw new BadRequestException("인증번호가 일치하지 않습니다.");
         }
+
+        UserStatus userStatus = UserStatus.EMAIL_AUTH;
+        LocalDateTime now = LocalDateTime.now();
+
+        user.updateUserStatus(userStatus, now);
     }
 }
