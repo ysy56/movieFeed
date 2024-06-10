@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum UserStatus {
 
     NORMAL("NORMAL"),
-    LEAVE("LEAVE");
+    LEAVE("LEAVE"),
+    EMAIL_AUTH("EMAIL_AUTH");
 
     private final String status;
 
