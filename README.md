@@ -219,6 +219,11 @@
 <br>
 
 ## 👩‍💻👨‍💻 팀원 구성
+| 노상윤 | 유균한 | 홍준빈 | 최영주 |
+|:---:|:---:|:---:|:---:|
+| <img src="https://ca.slack-edge.com/T06B9PCLY1E-U06S0N8HRJ8-6a09948d54c8-512" height="220"/> | <img src="https://ca.slack-edge.com/T06B9PCLY1E-U06RE49BU12-b4cbb22f8fe5-512" height="220"/> | <img src="https://ca.slack-edge.com/T06B9PCLY1E-U06SF9P0MM3-2cadc303ee44-512" height="220"/> | <img src="https://ca.slack-edge.com/T06B9PCLY1E-U06KADG3X1P-7d806be1d793-512" height="220"/> |
+| [@rohtable](https://github.com/rohtable) | [@ryurbsgks5114](https://github.com/ryurbsgks5114) | [@Hongjunbin](https://github.com/Hongjunbin) | [@ysy56](https://github.com/ysy56) | 
+| [코드 굽는 오븐](https://makeroh.tistory.com/) | [Github TIL](https://github.com/ryurbsgks5114/TIL) | [sangnamja](https://bin2dev.tistory.com/) | [컴공생의 발자취](https://moonnight0.tistory.com/) |
 
 <br>
 
