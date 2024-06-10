@@ -414,17 +414,44 @@ java.sql.SQLException: Data truncated for column 'user_status' at row 1
 </details>
 
 <details>
-<summary> return 문제 </summary>
+<summary> Spring Security 인증 및 인가 문제 </summary>
 
 * 문제 상황  
-  * 의도했던 기능 : 내용 작성  
-  * 발생한 현상(트러블) : 내용 작성  
+  * 의도했던 기능 : /api/users/signup 엔드포인트가 인가 없이 접근 가능하도록 설정
+  * 발생한 현상(트러블) : /api/users/signup 엔드포인트가 인가를 요구하는 문제 발생
 
-* 트러블 원인 추론  
-// 내용 작성  
+* 트러블 원인 추론
+WebSecurityConfig 클래스의 filter 처리 순서가 잘못설정 되어있다고 판단하여 addFilterBefore, addFilterAfter 메서드가 무엇인지에 대해서 찾아보고 여러 방법으로 변경해 보았습니다.
 
-* 해결방법  
-// 내용 작성  
+```
+http.authorizeHttpRequests( (authorizeHttpRequests) ->
+    authorizeHttpRequests
+        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+        .requestMatchers("/api/users/login", "/api/users/signup").permitAll()
+        .anyRequest().authenticated()
+);
+
+http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+```
+
+* 해결방법
+WebSecurityConfig의 설정에서 로직자체에는 문제가 없다는 결론을 내리고 해당 필터의 로직을 살펴 보았고 JwtAuthorizationFilter 클래스에서 doFilterInternal 메서드 부분에서 문제가 있는 걸 확인하였습니다.
+
+```
+if (!StringUtils.hasText(tokenValue) || !jwtUtil.validateToken(tokenValue)) {
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentType("text/plain;charset=utf-8");
+    response.getWriter().write("로그인 후 이용해 주세요.");
+
+    return;
+}
+```
+
+토큰 검증이 실패하면 클라이언트에게 메세지와 상태코드를 보내면서 로직을 마치려고 return문을 사용 하였는데, doFilterInternal 메서드의 맨 아래에 다음 필터로 넘어가게 하는 filterChain.doFilter(request, response); 코드가 있어 다음으로 넘어가지 못하고, 인가 처리 부분에서 계속 걸리던 오류였습니다.
+
+해당 부분은 try catch문을 사용 하여 정상적으로 예외가 발생하면 예외에 맞는 메세지와 상태 코드를 반환하고, 예외가 발생하지 않으면 다음 필터로 넘어가게 처리하였습니다.
+
 </details>
 
 <br>
