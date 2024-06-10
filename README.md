@@ -251,7 +251,88 @@
 
 ## 🏗 프로젝트 구조
 ```
-
+├── .github/ISSUE_TEMPLATE
+│    └── -task--이슈카드-제목-설정하기.md
+├── gradle/wrapper 
+│    ├── gradle-wrapper.jar
+│    └── gradle-wrapper.properties
+|    ├── main
+|    |    ├── java/com/sprata/moviefeed
+|    |    |    ├── config
+|    |    |    |    ├── BcryptConfig.java
+|    |    |    |    ├── EmailConfig.java
+|    |    |    |    ├── JwtConfig.java
+|    |    |    |    └── WebSecurityConfig.java
+|    |    |    ├── controller
+|    |    |    |    ├── BoardController.java
+|    |    |    |    ├── CommentController.java
+|    |    |    |    ├── EmailController.java
+|    |    |    |    ├── MypageController.java
+|    |    |    |    └── UserController.java
+|    |    |    ├── dto
+|    |    |    |    ├── requestdto
+|    |    |    |    |    ├── BoardRequestDto.java
+|    |    |    |    |    ├── CommentRequestDto.java
+|    |    |    |    |    ├── EmailCheckRequestDto.java
+|    |    |    |    |    ├── MypageRequestDto.java
+|    |    |    |    |    ├── PasswordRequestDto.java
+|    |    |    |    |    ├── UserLoginRequestDto.java
+|    |    |    |    |    ├── UserSignupRequestDto.java
+|    |    |    |    |    └── UserWithdrawalRequestDto.java
+|    |    |    |    ├── responsedto
+|    |    |    |    |    ├── BoardResponseDto.java
+|    |    |    |    |    ├── CommentResponseDto.java
+|    |    |    |    |    ├── CommonResponseDto.java
+|    |    |    |    └──  └── MypageResponseDto.java
+|    |    |    ├── entity
+|    |    |    |    ├── Board.java
+|    |    |    |    ├── Comment.java
+|    |    |    |    ├── Like.java
+|    |    |    |    ├── Timestamped.java
+|    |    |    |    └── User.java
+|    |    |    ├── enumeration
+|    |    |    |    ├── LikeType.java
+|    |    |    |    └── UserStatus.java
+|    |    |    ├── exception
+|    |    |    |    ├── BadRequestException.java
+|    |    |    |    ├── ConfictException.java
+|    |    |    |    ├── DataNotFoundException.java
+|    |    |    |    ├── ForbiddenException.java
+|    |    |    |    ├── GlobalExceptionHandler.java
+|    |    |    |    ├── TokenExpiredException.java
+|    |    |    |    ├── UnauthorizedException.java
+|    |    |    |    └── ViolatedLikeException.java
+|    |    |    ├── filter
+|    |    |    |    ├── JwtAuthenticationFilter.java
+|    |    |    |    └── JwtAuthorizationFilter.java
+|    |    |    ├── repository
+|    |    |    |    ├── BoardRepository.java
+|    |    |    |    ├── CommentRepository.java
+|    |    |    |    ├── LikeRepository.java
+|    |    |    |    └── UserRepository.java
+|    |    |    ├── security
+|    |    |    |    ├── CustomAuthenticationEntryPoint.java
+|    |    |    |    ├── UserDetailsImpl.java
+|    |    |    |    └── UserDetailsServiceImpl.java
+|    |    |    ├── service
+|    |    |    |    ├── BoardService.java
+|    |    |    |    ├── CommentService.java
+|    |    |    |    ├── EmailService.java
+|    |    |    |    ├── MypageService.java
+|    |    |    |    ├── RedisUtil.java
+|    |    |    |    └── UserService.java
+|    |    |    ├── util
+|    |    |    |    └── JwtUtil.java
+|    |    └──  └── MovieFeedApplication.java
+|    ├── resources
+|    |    └── application.properties
+|    ├── test/java/com/sprata/moviefeed
+|    └──  └── MovieFeedApplicationTests.java
+├── .gitignore
+├── build.gradle
+├── gradlew
+├── gradlew.bat
+└── settings.gradle
 ```
 <br>
 
