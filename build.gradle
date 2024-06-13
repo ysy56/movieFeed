@@ -30,6 +30,9 @@ dependencies {
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     implementation 'mysql:mysql-connector-java:8.0.28'
 
+    implementation 'ch.qos.logback:logback-classic:1.4.1' // logback
+    implementation 'org.slf4j:slf4j-api:2.0.3' // slf4j
+
     // email 인증
     implementation 'javax.mail:mail:1.4.7'
     // Spring Context Support
