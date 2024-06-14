@@ -28,4 +28,12 @@ public class UserSignupRequestDto {
     @NotBlank(message = "한 줄 소개를 입력해주세요.")
     private String intro;
 
+    public UserSignupRequestDto(String userId, String password, String userName, String email, String intro) {
+        this.userId = userId;
+        this.password = password;
+        this.userName = userName;
+        this.email = email;
+        this.intro = intro;
+    }
+
 }
