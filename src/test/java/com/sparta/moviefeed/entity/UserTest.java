@@ -1,5 +1,6 @@
 package com.sparta.moviefeed.entity;
 
+import com.sparta.moviefeed.dto.requestdto.MypageRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.enumeration.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,5 +50,19 @@ class UserTest {
         assertEquals(email, user.getEmail());
         assertEquals(intro, user.getIntro());
         assertEquals(userStatus, user.getUserStatus());
+    }
+
+    @Test
+    @DisplayName("마이페이지 업데이트")
+    void testUpdateMypage() {
+        String newUserName = "Update User";
+        String newIntro = "Update intro.";
+
+        MypageRequestDto RequestDto = new MypageRequestDto(newUserName, newIntro);
+
+        user.updateMypage(RequestDto);
+
+        assertEquals(newUserName, user.getUserName());
+        assertEquals(newIntro, user.getIntro());
     }
 }
