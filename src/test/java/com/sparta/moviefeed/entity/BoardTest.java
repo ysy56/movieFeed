@@ -35,4 +35,18 @@ class BoardTest {
         assertEquals(content, board.getContent());
         assertEquals(user, board.getUser());
     }
+
+    @Test
+    @DisplayName("게시물 수정")
+    void testUpdate() {
+        String newTitle = "Test NewTitle";
+        String newContent = "Test NewContent";
+
+        BoardRequestDto requestDto = new BoardRequestDto(newTitle, newContent);
+
+        board.update(requestDto);
+
+        assertEquals(newTitle, board.getTitle());
+        assertEquals(newContent, board.getContent());
+    }
 }
