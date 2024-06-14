@@ -33,4 +33,16 @@ class CommentTest {
         assertEquals(board, comment.getBoard());
         assertEquals(user, comment.getUser());
     }
+
+    @Test
+    @DisplayName("댓글 수정")
+    void testUpdate() {
+        String newContent = "Test NewContent";
+
+        CommentRequestDto requestDto = new CommentRequestDto(newContent);
+
+        comment.update(requestDto);
+
+        assertEquals(newContent, comment.getContent());
+    }
 }
