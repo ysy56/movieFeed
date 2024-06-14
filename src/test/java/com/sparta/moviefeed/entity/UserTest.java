@@ -65,4 +65,14 @@ class UserTest {
         assertEquals(newUserName, user.getUserName());
         assertEquals(newIntro, user.getIntro());
     }
+
+    @Test
+    @DisplayName("비밀번호 수정")
+    void testUpdatePassword() {
+        String newPassword = "qwer1234!";
+
+        user.updatePassword(newPassword);
+
+        assertEquals(newPassword, user.getPassword());
+    }
 }
