@@ -99,4 +99,14 @@ class UserTest {
         assertEquals(newUserStatus, user.getUserStatus());
         assertEquals(now, user.getStatusAt());
     }
+
+    @Test
+    @DisplayName("비밀번호 암호화")
+    void testEncryptionPassword() {
+        String newEncryptionPassword = "EncryptedPassword123!";
+
+        user.updatePassword(newEncryptionPassword);
+
+        assertEquals(newEncryptionPassword, user.getPassword());
+    }
 }
