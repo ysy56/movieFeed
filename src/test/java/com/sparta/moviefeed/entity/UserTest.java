@@ -75,4 +75,14 @@ class UserTest {
 
         assertEquals(newPassword, user.getPassword());
     }
+
+    @Test
+    @DisplayName("리프레시 토큰 업데이트")
+    void testUpdateRefreshToken() {
+        String newRefreshToken = "newRefreshToken";
+
+        user.updateRefreshToken(newRefreshToken);
+
+        assertEquals(newRefreshToken, user.getRefreshToken());
+    }
 }
