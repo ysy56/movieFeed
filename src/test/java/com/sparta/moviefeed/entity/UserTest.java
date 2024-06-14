@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
@@ -84,5 +86,17 @@ class UserTest {
         user.updateRefreshToken(newRefreshToken);
 
         assertEquals(newRefreshToken, user.getRefreshToken());
+    }
+
+    @Test
+    @DisplayName("회원상태코드 업데이트")
+    void testUpdateUserStatus() {
+        UserStatus newUserStatus = UserStatus.LEAVE;
+        LocalDateTime now = LocalDateTime.now();
+
+        user.updateUserStatus(newUserStatus, now);
+
+        assertEquals(newUserStatus, user.getUserStatus());
+        assertEquals(now, user.getStatusAt());
     }
 }
