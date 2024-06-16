@@ -119,21 +119,4 @@ class UserTest {
         assertEquals(newEncryptionPassword, user.getPassword());
     }
 
-    @Test
-    @DisplayName("회원가입 유효성 검사 실패 테스트")
-    void testUserSignupRequestDtoValidationFilure() {
-        UserSignupRequestDto invalidDto = new UserSignupRequestDto(
-                "", // Invalid userId
-                "short", // Invalid password
-                "", // Invalid userName
-                "invalid-email", // Invalid email
-                "" // Invalid intro
-        );
-
-        Set<ConstraintViolation<UserSignupRequestDto>> violations = validator.validate(invalidDto);
-
-        for (ConstraintViolation<UserSignupRequestDto> violation : violations) {
-            System.out.println(violation.getMessage());
-        }
-    }
 }
