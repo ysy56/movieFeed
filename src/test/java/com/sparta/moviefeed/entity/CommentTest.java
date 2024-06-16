@@ -18,6 +18,8 @@ class CommentTest {
     @BeforeEach
     void setUp() {
         content = "Test Content";
+        user = new User();
+        board = new Board();
 
         commentRequestDto = new CommentRequestDto(
                 content

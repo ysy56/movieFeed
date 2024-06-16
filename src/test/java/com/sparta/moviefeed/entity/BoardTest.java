@@ -19,6 +19,7 @@ class BoardTest {
     void setUp() {
         title = "Test Title";
         content = "Test Content";
+        user = new User();
 
         boardRequestDto = new BoardRequestDto(
                 title,
