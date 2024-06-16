@@ -14,41 +14,32 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserWithdrawalRequestDtoTest {
     private Validator validator;
-    private UserWithdrawalRequestDto userWithdrawalRequestDto;
-
-    private String password;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
-        password = "password1234!";
-
-        userWithdrawalRequestDto = new UserWithdrawalRequestDto(
-                password
-        );
     }
 
     @Test
-    @DisplayName("비밀번호 수정 유효성 검사 실패 테스트")
-    void testEmailCheckRequestDtoTestValidationFilure() {
-        UserWithdrawalRequestDto invalidDto = new UserWithdrawalRequestDto(
-                ""
-        );
+    @DisplayName("유효한 UserWithdrawalRequestDto 테스트")
+    void testValidUserWithdrawalRequestDto() {
+        UserWithdrawalRequestDto invalidDto = new UserWithdrawalRequestDto("Test Password");
 
         Set<ConstraintViolation<UserWithdrawalRequestDto>> violations = validator.validate(invalidDto);
 
-        for (ConstraintViolation<UserWithdrawalRequestDto> violation : violations) {
-            System.out.println(violation.getMessage());
-        }
+        assertTrue(violations.isEmpty());
     }
 
     @Test
-    @DisplayName("비밀번호 수정 유효성 검사 성공 테스트")
-    void testEmailCheckRequestDtoTestValidationSuccess() {
-        Set<ConstraintViolation<UserWithdrawalRequestDto>> violations = validator.validate(userWithdrawalRequestDto);
+    @DisplayName("빈 값 유효성 검사 실패 테스트")
+    void testBlankFields() {
+        UserWithdrawalRequestDto invalidDto = new UserWithdrawalRequestDto("");
 
-        assertTrue(violations.isEmpty());
+        Set<ConstraintViolation<UserWithdrawalRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(1, violations.size()); // email, authCode
+        assertEquals("비밀번호를 입력해주세요.", violations.iterator().next().getMessage());
     }
 }
