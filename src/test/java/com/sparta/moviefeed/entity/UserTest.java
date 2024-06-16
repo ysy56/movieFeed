@@ -3,16 +3,22 @@ package com.sparta.moviefeed.entity;
 import com.sparta.moviefeed.dto.requestdto.MypageRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.enumeration.UserStatus;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
 
+    private Validator validator;
     private UserSignupRequestDto userSignupRequestDto;
     private User user;
 
@@ -25,6 +31,9 @@ class UserTest {
 
     @BeforeEach
     void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+
         userId = "testUser123";
         password = "Password1234!";
         userName = "Test User";
@@ -108,5 +117,23 @@ class UserTest {
         user.updatePassword(newEncryptionPassword);
 
         assertEquals(newEncryptionPassword, user.getPassword());
+    }
+
+    @Test
+    @DisplayName("회원가입 유효성 검사 실패 테스트")
+    void testUserSignupRequestDtoValidationFilure() {
+        UserSignupRequestDto invalidDto = new UserSignupRequestDto(
+                "", // Invalid userId
+                "short", // Invalid password
+                "", // Invalid userName
+                "invalid-email", // Invalid email
+                "" // Invalid intro
+        );
+
+        Set<ConstraintViolation<UserSignupRequestDto>> violations = validator.validate(invalidDto);
+
+        for (ConstraintViolation<UserSignupRequestDto> violation : violations) {
+            System.out.println(violation.getMessage());
+        }
     }
 }
