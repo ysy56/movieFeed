@@ -14,34 +14,32 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EmailCheckRequestDtoTest {
     private Validator validator;
-    private EmailCheckRequestDto emailCheckRequestDto;
-
-    private String authCode;
-    private String email;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
-        email = "testuser@example.com";
-        authCode = "123895";
-
-        emailCheckRequestDto = new EmailCheckRequestDto(
-                email,
-                authCode
-        );
     }
 
     @Test
-    @DisplayName("이메일 인증 유효성 검사 실패 테스트")
-    void testEmailCheckRequestDtoTestValidationFilure() {
-        EmailCheckRequestDto invalidDto = new EmailCheckRequestDto(
-                "", // Invalid email
-                "" // Invalid authCode
-        );
+    @DisplayName("유효한 EmailCheckRequestDto 테스트")
+    void testValidEmailCheckRequestDto() {
+        EmailCheckRequestDto invalidDto = new EmailCheckRequestDto("test@naver.com", "123456");
 
         Set<ConstraintViolation<EmailCheckRequestDto>> violations = validator.validate(invalidDto);
+
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 EmailCheckRequestDto 테스트")
+    void testInValidEmailCheckRequestDto() {
+        EmailCheckRequestDto invalidDto = new EmailCheckRequestDto("invalid-email", "");
+
+        Set<ConstraintViolation<EmailCheckRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(2, violations.size());
 
         for (ConstraintViolation<EmailCheckRequestDto> violation : violations) {
             System.out.println(violation.getMessage());
@@ -49,10 +47,30 @@ class EmailCheckRequestDtoTest {
     }
 
     @Test
-    @DisplayName("이메일 인증 유효성 검사 성공 테스트")
-    void testEmailCheckRequestDtoTestValidationSuccess() {
-        Set<ConstraintViolation<EmailCheckRequestDto>> violations = validator.validate(emailCheckRequestDto);
+    @DisplayName("Email 유효성 검사 실패 테스트")
+    void testInvalidEmail() {
+        EmailCheckRequestDto invalidDto = new EmailCheckRequestDto("invalid-email", "123456");
 
-        assertTrue(violations.isEmpty());
+        Set<ConstraintViolation<EmailCheckRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(1, violations.size());
+
+        assertEquals("이메일 형식을 확인해 주세요.", violations.iterator().next().getMessage());
+    }
+
+    @Test
+    @DisplayName("빈 값 유효성 검사 실패 테스트")
+    void testBlankFields() {
+        EmailCheckRequestDto invalidDto = new EmailCheckRequestDto("", "");
+
+        Set<ConstraintViolation<EmailCheckRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(3, violations.size()); // email, authCode
+
+        for (ConstraintViolation<EmailCheckRequestDto> violation : violations) {
+            System.out.println(violation.getMessage());
+        }
     }
 }
