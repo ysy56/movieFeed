@@ -14,45 +14,35 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MypageRequestDtoTest {
     private Validator validator;
-    private MypageRequestDto mypageRequestDto;
-
-    private String userName;
-    private String intro;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
-        userName = "Test Name";
-        intro = "Test intro.";
-
-        mypageRequestDto = new MypageRequestDto(
-                userName,
-                intro
-        );
     }
 
     @Test
-    @DisplayName("마이페이지 유효성 검사 실패 테스트")
-    void testEmailCheckRequestDtoTestValidationFilure() {
-        MypageRequestDto invalidDto = new MypageRequestDto(
-                "", // Invalid email
-                "" // Invalid authCode
-        );
+    @DisplayName("유효한 EmailCheckRequestDto 테스트")
+    void testValidMypageRequestDto() {
+        MypageRequestDto invalidDto = new MypageRequestDto("Test Username", "Test Introduction.");
 
         Set<ConstraintViolation<MypageRequestDto>> violations = validator.validate(invalidDto);
+
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    @DisplayName("빈 값 유효성 검사 실패 테스트")
+    void testBlankFields() {
+        MypageRequestDto invalidDto = new MypageRequestDto("", "");
+
+        Set<ConstraintViolation<MypageRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(2, violations.size()); // email, authCode
 
         for (ConstraintViolation<MypageRequestDto> violation : violations) {
             System.out.println(violation.getMessage());
         }
-    }
-
-    @Test
-    @DisplayName("이메일 인증 유효성 검사 성공 테스트")
-    void testEmailCheckRequestDtoTestValidationSuccess() {
-        Set<ConstraintViolation<MypageRequestDto>> violations = validator.validate(mypageRequestDto);
-
-        assertTrue(violations.isEmpty());
     }
 }
