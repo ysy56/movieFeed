@@ -14,34 +14,32 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PasswordRequestDtoTest {
     private Validator validator;
-    private PasswordRequestDto passwordRequestDto;
-
-    private String password;
-    private String newPassword;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
-        password = "password1234!";
-        newPassword = "newPassword1234!";
-
-        passwordRequestDto = new PasswordRequestDto(
-                password,
-                newPassword
-        );
     }
 
     @Test
-    @DisplayName("비밀번호 수정 유효성 검사 실패 테스트")
-    void testEmailCheckRequestDtoTestValidationFilure() {
-        PasswordRequestDto invalidDto = new PasswordRequestDto(
-                "", // Invalid email
-                "" // Invalid authCode
-        );
+    @DisplayName("유효한 PasswordRequestDto 테스트")
+    void testValidPasswordRequestDto() {
+        PasswordRequestDto invalidDto = new PasswordRequestDto("password1234!", "newPassword1234!");
 
         Set<ConstraintViolation<PasswordRequestDto>> violations = validator.validate(invalidDto);
+
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 PasswordRequestDto 테스트")
+    void testInValidPasswordRequestDto() {
+        PasswordRequestDto invalidDto = new PasswordRequestDto("", "invalid-passowrd");
+
+        Set<ConstraintViolation<PasswordRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(2, violations.size());
 
         for (ConstraintViolation<PasswordRequestDto> violation : violations) {
             System.out.println(violation.getMessage());
@@ -49,10 +47,45 @@ class PasswordRequestDtoTest {
     }
 
     @Test
-    @DisplayName("비밀번호 수정 유효성 검사 성공 테스트")
-    void testEmailCheckRequestDtoTestValidationSuccess() {
-        Set<ConstraintViolation<PasswordRequestDto>> violations = validator.validate(passwordRequestDto);
+    @DisplayName("newPassword 길이 유효성 검사 실패 테스트")
+    void testShortPassword() {
+        PasswordRequestDto invalidDto = new PasswordRequestDto("password1234!", "short");
 
-        assertTrue(violations.isEmpty());
+        Set<ConstraintViolation<PasswordRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(2, violations.size());
+
+        for (ConstraintViolation<PasswordRequestDto> violation : violations) {
+            System.out.println(violation.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("newPassword 정규식 유효성 검사 실패 테스트")
+    void testRegexpPassword() {
+        PasswordRequestDto invalidDto = new PasswordRequestDto("password1234!", "invalid-password");
+
+        Set<ConstraintViolation<PasswordRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(1, violations.size());
+
+        assertEquals("비밀번호는 영문 대소문자 + 숫자 + 특수문자를 최소 1글자씩 포함합니다.", violations.iterator().next().getMessage());
+    }
+
+    @Test
+    @DisplayName("빈 값 유효성 검사 실패 테스트")
+    void testBlankFields() {
+        PasswordRequestDto invalidDto = new PasswordRequestDto("", "");
+
+        Set<ConstraintViolation<PasswordRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(4, violations.size());
+
+        for (ConstraintViolation<PasswordRequestDto> violation : violations) {
+            System.out.println(violation.getMessage());
+        }
     }
 }
