@@ -14,45 +14,35 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserLoginRequestDtoTest {
     private Validator validator;
-    private UserLoginRequestDto userLoginRequestDto;
-
-    private String userId;
-    private String Password;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
-        userId = "Test UserId";
-        Password = "Password1234!";
-
-        userLoginRequestDto = new UserLoginRequestDto(
-                userId,
-                Password
-        );
     }
 
     @Test
-    @DisplayName("로그인 유효성 검사 실패 테스트")
-    void testEmailCheckRequestDtoTestValidationFilure() {
-        UserLoginRequestDto invalidDto = new UserLoginRequestDto(
-                "", // Invalid email
-                "" // Invalid authCode
-        );
+    @DisplayName("유효한 UserLoginRequestDto 테스트")
+    void testValidUserLoginRequestDto() {
+        UserLoginRequestDto invalidDto = new UserLoginRequestDto("Test UserId", "Test Password");
 
         Set<ConstraintViolation<UserLoginRequestDto>> violations = validator.validate(invalidDto);
+
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    @DisplayName("빈 값 유효성 검사 실패 테스트")
+    void testBlankFields() {
+        UserLoginRequestDto invalidDto = new UserLoginRequestDto("", "");
+
+        Set<ConstraintViolation<UserLoginRequestDto>> violations = validator.validate(invalidDto);
+
+        assertFalse(violations.isEmpty());
+        assertEquals(2, violations.size()); // email, authCode
 
         for (ConstraintViolation<UserLoginRequestDto> violation : violations) {
             System.out.println(violation.getMessage());
         }
-    }
-
-    @Test
-    @DisplayName("비밀번호 수정 유효성 검사 성공 테스트")
-    void testEmailCheckRequestDtoTestValidationSuccess() {
-        Set<ConstraintViolation<UserLoginRequestDto>> violations = validator.validate(userLoginRequestDto);
-
-        assertTrue(violations.isEmpty());
     }
 }
