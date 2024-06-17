@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.moviefeed.config.WebSecurityConfig;
 import com.sparta.moviefeed.controller.BoardController;
 import com.sparta.moviefeed.controller.UserController;
+import com.sparta.moviefeed.dto.requestdto.BoardRequestDto;
 import com.sparta.moviefeed.dto.requestdto.UserSignupRequestDto;
 import com.sparta.moviefeed.entity.User;
 import com.sparta.moviefeed.enumeration.UserStatus;
@@ -93,7 +94,7 @@ public class BoardMvcTest {
 
     @Test
     @DisplayName("회원 가입 요청 처리")
-    void test2() throws Exception {
+    void test1() throws Exception {
         // given
         String userId = "testUser123";
         String password = "Password1234!";
@@ -115,6 +116,32 @@ public class BoardMvcTest {
         mvc.perform(post("/api/users/signup")
                         .content(postInfo)
                         .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시물 등록 요청 처리")
+    void test2() throws Exception {
+        // given
+        this.mockUserSetup();
+        String title = "Test Title";
+        String content = "Test Content.";
+
+        BoardRequestDto requestDto = new BoardRequestDto(
+                title,
+                content
+        );
+
+        String postInfo = objectMapper.writeValueAsString(requestDto);
+
+        // when - then
+        mvc.perform(post("/api/boards")
+                        .content(postInfo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .principal(mockPrincipal)
                 )
                 .andExpect(status().isCreated())
                 .andDo(print());
