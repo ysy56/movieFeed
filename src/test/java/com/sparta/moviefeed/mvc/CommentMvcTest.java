@@ -29,10 +29,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -151,6 +154,35 @@ public class CommentMvcTest {
                         .principal(mockPrincipal)
                 )
                 .andExpect(status().isCreated())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("특정 게시물의 모든 댓글 조회")
+    void test3() throws Exception {
+        // given
+        User user = mockUserSetup();
+        Board board = new Board();
+
+        Long boardId = 1L;
+        String content = "Test Content.";
+
+        CommentRequestDto requestDto = new CommentRequestDto(content);
+
+        Comment comment = new Comment(requestDto, board, user);
+        List<CommentResponseDto> comments = new ArrayList<>();
+        comments.add(new CommentResponseDto(comment));
+        comments.add(new CommentResponseDto(comment));
+
+        given(commentService.getAllComments(boardId)).willReturn(comments);
+
+        // when - then
+        mvc.perform(get("/api/boards/{boardId}/comments", boardId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .principal(mockPrincipal)
+                )
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 }
