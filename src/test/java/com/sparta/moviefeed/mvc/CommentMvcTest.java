@@ -34,6 +34,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -213,6 +214,27 @@ public class CommentMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(mockPrincipal)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 요청")
+    void test5() throws Exception {
+        // given
+        User user = mockUserSetup();
+        Long boardId = 1L;
+        Long commentId = 1L;
+
+        // Mock the service method
+        doNothing().when(commentService).deleteComment(commentId, user);
+
+        // when - then
+        mvc.perform(delete("/api/boards/{boardId}/comments/{commentId}", boardId, commentId)
+                        .principal(mockPrincipal)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
