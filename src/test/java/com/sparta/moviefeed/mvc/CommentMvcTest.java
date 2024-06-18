@@ -35,8 +35,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -174,10 +173,43 @@ public class CommentMvcTest {
         comments.add(new CommentResponseDto(comment));
         comments.add(new CommentResponseDto(comment));
 
-        given(commentService.getAllComments(boardId)).willReturn(comments);
+        given(commentService.getAllComments(any(Long.class))).willReturn(comments);
 
         // when - then
         mvc.perform(get("/api/boards/{boardId}/comments", boardId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .principal(mockPrincipal)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 요청")
+    void test4() throws Exception {
+        // given
+        User user = mockUserSetup();
+        Board board = new Board();
+
+        Long boardId = 1L;
+        Long commentId = 1L;
+        String updatedContent = "Updated Content";
+
+        CommentRequestDto requestDto = new CommentRequestDto(updatedContent);
+
+        Comment comment = new Comment(requestDto, board, user);
+
+        CommentResponseDto responseDto = new CommentResponseDto(comment);
+
+        given(commentService.updateComment(any(Long.class), any(CommentRequestDto.class), any(User.class)))
+                .willReturn(responseDto);
+
+        String getInfo = objectMapper.writeValueAsString(requestDto);
+
+        // when - then
+        mvc.perform(put("/api/boards/{boardId}/comments/{commentId}", boardId, commentId)
+                        .content(getInfo)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(mockPrincipal)
