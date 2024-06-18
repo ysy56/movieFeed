@@ -31,6 +31,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.security.Principal;
+import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -183,6 +184,34 @@ public class BoardMvcTest {
 
         // then
         mvc.perform(get("/api/boards/{boardId}", boardId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("전체 게시물 조회 요청 처리")
+    void test4() throws Exception {
+        // given
+        User user = mockUserSetup();
+        String title = "Test Title";
+        String content = "Test Content.";
+
+        BoardRequestDto requestDto = new BoardRequestDto(
+                title,
+                content
+        );
+
+        Board board = new Board(requestDto, user);
+
+        BoardResponseDto responseDto = new BoardResponseDto(board);
+
+        given(boardService.selectAllBoard()).willReturn(Collections.singletonList(responseDto));
+
+        // then
+        mvc.perform(get("/api/boards")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                 )
