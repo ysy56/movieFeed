@@ -36,8 +36,7 @@ import java.util.Collections;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -214,6 +213,41 @@ public class BoardMvcTest {
         mvc.perform(get("/api/boards")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시물 수정 요청 처리")
+    void test5() throws Exception {
+        // given
+        User user = mockUserSetup();
+        Long boardId = 1L;
+        String title = "Update Title";
+        String content = "Update Content.";
+
+        BoardRequestDto requestDto = new BoardRequestDto(
+                title,
+                content
+        );
+
+        Board board = new Board(requestDto, user);
+
+        BoardResponseDto responseDto = new BoardResponseDto(board);
+
+        // Mock the service method
+        given(boardService.updateBoard(any(Long.class), any(BoardRequestDto.class), any(User.class)))
+                .willReturn(responseDto);
+
+        String putInfo = objectMapper.writeValueAsString(requestDto);
+
+        // when - then
+        mvc.perform(put("/api/boards/{boardId}", boardId)
+                        .content(putInfo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .principal(mockPrincipal)
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
