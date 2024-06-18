@@ -35,6 +35,7 @@ import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -252,4 +253,25 @@ public class BoardMvcTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("게시물 삭제 요청 처리")
+    void test6() throws Exception {
+        // given
+        User user = mockUserSetup();
+        Long boardId = 1L;
+
+        // Mock the service method
+        doNothing().when(boardService).deleteBoard(boardId, user);
+
+        // when - then
+        mvc.perform(delete("/api/boards/{boardId}", boardId)
+                        .principal(mockPrincipal)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
 }
