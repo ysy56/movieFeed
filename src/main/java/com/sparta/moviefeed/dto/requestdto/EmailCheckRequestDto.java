@@ -12,4 +12,9 @@ public class EmailCheckRequestDto {
 
     @NotBlank(message = "인증코드를 입력해주세요.")
     private String authCode;
+
+    public EmailCheckRequestDto(String email, String authCode) {
+        this.email = email;
+        this.authCode = authCode;
+    }
 }

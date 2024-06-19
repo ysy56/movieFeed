@@ -9,4 +9,8 @@ public class UserWithdrawalRequestDto {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 
+    public UserWithdrawalRequestDto(String password) {
+        this.password = password;
+    }
+
 }

@@ -15,4 +15,9 @@ public class PasswordRequestDto {
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
+
+    public PasswordRequestDto(String password, String newPassword) {
+        this.password = password;
+        this.newPassword = newPassword;
+    }
 }
